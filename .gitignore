@@ -1,2 +1,6 @@
 *.py
 *.net
+
+
+!forth.py
+
