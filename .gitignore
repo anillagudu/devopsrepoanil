@@ -1,8 +1,0 @@
-*.py
-*.net
-
-
-!fourth.py
-
-[aeiou]*.php
-
