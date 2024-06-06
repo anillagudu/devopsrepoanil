@@ -1,0 +1,31 @@
+def buildNumber= BUILD_NUMBER
+    
+    stage("GIT CLONE") {
+        
+        git url: 'https://github.com/MithunTechnologiesDevOps/java-web-app-docker.git',branch: 'master'
+    }
+    
+    stage("build the source code") {
+        
+        def mavenHome= tool name:'Maven',type: 'maven'
+        
+        sh "${mavenHome}/bin/mvn clean package"
+    }
+    
+    stage("push into artifactory"){
+        
+        sh "docker build -t anillagudu/java-web-app-docker:${buildNumber} ."
+        
+        sh "docker push anillagudu/java-web-app-docker:${buildNumber}"
+    }
+    
+    stage("container deployment"){
+        
+        sshagent(['Dockerdeployment']) {
+        
+        sh "ssh -o StrictHostKeyChecking=no ubuntu@10.1.2.133 docker rm -f javawebappcontainer || true"
+        
+        sh "ssh -o StrictHostKeyChecking=no ubuntu@10.1.2.133 docker run -d --name javawebappcontainer -p 3000:9981 anillagudu/java-web-app-docker:${buildNumber} "
+      }
+    }
+}
